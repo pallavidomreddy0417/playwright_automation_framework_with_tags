@@ -6,6 +6,7 @@ A custom Playwright + Node.js UI test automation framework — no `@playwright/t
 
 - [Node.js](https://nodejs.org/) 18 or later
 - npm (bundled with Node.js)
+- make sure chrome installed
 
 ## Setup
 
