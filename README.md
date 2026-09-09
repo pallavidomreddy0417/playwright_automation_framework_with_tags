@@ -101,6 +101,15 @@ npm run allure:generate
 npm run allure:open
 ```
 
+## Troubleshooting
+
+**`browserType.launch: Target page, context or browser has been closed`** — the browser process starts and then dies immediately, before Playwright can connect to it. This is a local-machine issue, not a code bug (the runner auto-retries the launch once for exactly this reason). Common causes and fixes:
+
+1. **You downloaded this repo as a ZIP into `Downloads` instead of using `git clone`.** Windows marks files extracted from a downloaded ZIP as untrusted ("Mark of the Web"), and antivirus/EDR software often kills a freshly-extracted, unrecognized `chrome.exe` the first time it runs. Fix: use `git clone` instead, or right-click the ZIP → Properties → **Unblock** before extracting, and/or move the extracted folder out of `Downloads`.
+2. **Corrupted/incomplete browser download.** Reinstall the browser binaries: `npx playwright install --force`.
+3. **Antivirus/EDR quarantined `chrome.exe`.** Check your AV's quarantine/logs around the failure time.
+4. **Headed-window issues** (e.g. no display / remote session). Try `HEADLESS=true` (PowerShell: `$env:HEADLESS='true'`) to rule this out.
+
 ## Continuous Integration
 
 A GitHub Actions workflow (`.github/workflows/ci.yml`) runs the smoke tests on every push/PR to `main`, across Ubuntu, Windows, and macOS runners — so anyone forking or cloning this repo gets an automatic pass/fail signal without needing Jenkins. Reports are uploaded as build artifacts on each run.

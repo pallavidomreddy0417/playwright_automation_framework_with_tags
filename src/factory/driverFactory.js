@@ -41,6 +41,41 @@ class DriverFactory {
   }
 
   /**
+   * Launch the browser, retrying once on failure.
+   * A browser process that is killed immediately after spawning (before Playwright
+   * can connect to it) is almost always antivirus/EDR quarantining a freshly
+   * downloaded/extracted chrome.exe on first sight - the retry alone resolves most
+   * of these, since the binary is no longer "new" to the AV on the second attempt.
+   */
+  static async launchWithRetry(browserType, launchOptions, attempts = 2) {
+    let lastErr;
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        return await browserType.launch(launchOptions);
+      } catch (err) {
+        lastErr = err;
+        if (attempt < attempts) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+    }
+    const hint = [
+      `Failed to launch the browser after ${attempts} attempt(s): ${lastErr.message}`,
+      '',
+      'This is almost always a local environment issue, not a code bug. Try:',
+      '  1. npx playwright install --force   (reinstall browser binaries)',
+      '  2. If you downloaded this repo as a ZIP, use "git clone" instead, or right-click',
+      '     the ZIP > Properties > Unblock before extracting (Windows blocks files',
+      '     extracted from downloaded ZIPs, which can kill chrome.exe on launch).',
+      '  3. Check whether antivirus/EDR quarantined chrome.exe around this time.',
+      '  4. Try HEADLESS=true to rule out headed-window issues.'
+    ].join('\n');
+    const wrapped = new Error(hint);
+    wrapped.cause = lastErr;
+    throw wrapped;
+  }
+
+  /**
    * Initialize Browser/Context/Page on the provided Cucumber World.
    * Supports: chromium, firefox, webkit.
    */
@@ -86,7 +121,7 @@ class DriverFactory {
       args: launchArgs.length ? launchArgs : undefined
     };
 
-    world.browser = await browserType.launch(launchOptions);
+    world.browser = await DriverFactory.launchWithRetry(browserType, launchOptions);
 
     // Chromium can rely on the real browser window when start-maximized is used.
     // For Firefox/WebKit, use a large viewport as a maximize equivalent.
