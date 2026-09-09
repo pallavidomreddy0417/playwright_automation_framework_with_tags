@@ -2,7 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 function envGet(k) {
-  return process.env[k] ?? process.env[String(k).toUpperCase()] ?? process.env[String(k).toLowerCase()];
+  // Exact key only - no case-folded fallback. Case-folding here previously let unrelated
+  // OS/tooling env vars (e.g. BROWSER, set by many JS dev-server tools) silently override
+  // framework config when only their casing happened to match a config key.
+  return process.env[k];
 }
 
 function propGet(props, k) {

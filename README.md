@@ -59,6 +59,8 @@ npm run test:regression  # --tags regression
 
 CLI flags (`--env`, `--role`, `--browser`, `--tags`) take priority over environment variables, which take priority over `config/testdata.properties`, which falls back to built-in defaults.
 
+> **Windows note:** environment variable names are case-insensitive at the OS level on Windows, so `browser` and `BROWSER` (or `Environment`/`ENVIRONMENT`) are the same variable there. If some other tool on your machine sets `BROWSER` for its own purposes, it will affect this framework's browser selection too unless you override it explicitly (`--browser` flag or `config/testdata.properties`). This is a Windows OS characteristic, not framework-specific behavior — on Linux/macOS these names are distinct.
+
 ## Project structure
 
 ```

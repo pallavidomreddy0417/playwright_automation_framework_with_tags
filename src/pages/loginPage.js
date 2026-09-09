@@ -27,6 +27,20 @@ class LoginPage {
     return null;
   }
 
+  /**
+   * Like #firstExisting, but polls for up to timeoutMs since the candidates may not be
+   * in the DOM yet (e.g. a menu that opens via a CSS transition or async render after a click).
+   */
+  async #firstExistingWithWait(candidates, timeoutMs = 3000) {
+    const start = Date.now();
+    let found = await this.#firstExisting(candidates);
+    while (!found && Date.now() - start < timeoutMs) {
+      await this.page.waitForTimeout(150);
+      found = await this.#firstExisting(candidates);
+    }
+    return found;
+  }
+
   async #ensureLocators() {
     if (this.#resolved) return;
 
@@ -207,7 +221,7 @@ class LoginPage {
     }
 
     await resolved.trigger.click();
-    const item = await this.#firstExisting(this.#menuItemCandidates());
+    const item = await this.#firstExistingWithWait(this.#menuItemCandidates());
     if (!item) {
       throw new Error(
         `LoginPage: opened the profile menu but could not find a Logout menu item.\n` +

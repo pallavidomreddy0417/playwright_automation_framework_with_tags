@@ -11,12 +11,34 @@ pipeline {
     options {
         timestamps()
         disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
+    environment {
+        // Jenkins agents normally run as a service with no interactive desktop session,
+        // so a headed browser launch fails/hangs there - always run headless in CI.
+        HEADLESS = 'true'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Validate parameters') {
+            steps {
+                script {
+                    // Environment/Role/Browser are fixed `choice` params, so they can't carry
+                    // arbitrary text. Tags is a free-text `string` param that gets substituted
+                    // into a `bat` (cmd.exe) command below - cmd.exe expands %VAR% before it
+                    // parses for "&"/"|"/"^" etc, even inside quotes, so an unvalidated value
+                    // could inject extra commands. Only allow safe tag-expression syntax.
+                    if (!(params.Tags ==~ /[A-Za-z0-9_ \t()]*/)) {
+                        error("Tags parameter contains characters that aren't allowed in a tag expression: ${params.Tags}")
+                    }
+                }
             }
         }
 
@@ -29,7 +51,7 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                bat "node runner.js --env %Environment% --role %Role% --browser %Browser% --tags \"%Tags%\""
+                bat "node runner.js --env %Environment% --role %Role% --browser %Browser% --tags \"${params.Tags}\""
             }
         }
     }

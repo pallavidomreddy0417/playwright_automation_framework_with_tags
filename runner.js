@@ -115,7 +115,7 @@ async function run() {
 
   const existingFiles = testFiles.filter(f => fs.existsSync(f));
   if (existingFiles.length === 0) {
-    console.error(`No test files found. Looked in: ${fileArg ? fileArg : 'tests/**/*.spec.js'}`);
+    console.error(`No test files found. Looked in: ${fileArg.file || 'tests/**/*.spec.js'}`);
     process.exit(2);
   }
 
@@ -171,7 +171,6 @@ async function run() {
 
     // world-like object for DriverFactory (keeps parallel-safe shape if you later parallelize)
     const world = {};
-    await DriverFactory.initDriver(world, process.env.browser);
     // Provide config to hooks (auto-login needs it)
     world.config = cfg;
 
@@ -180,6 +179,10 @@ async function run() {
     let rel = null;
 
     try {
+      // Launching inside the try/catch means a browser-launch failure on one test
+      // is recorded as that test's failure instead of aborting the whole suite.
+      await DriverFactory.initDriver(world, process.env.browser);
+
       const ctx = attachStepHelpers({
         reporter,
         testEntry,

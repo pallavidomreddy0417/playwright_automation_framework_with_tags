@@ -21,12 +21,13 @@ class DriverFactory {
     if (!world?.page) return;
     try {
       if (normalized === 'chromium') {
-        // Keep Chromium tied to the actual browser window dimensions.
-        await world.page.setViewportSize({ width: maximizeWidth, height: maximizeHeight });
-      } else {
-        // Firefox/WebKit: enforce a large viewport regardless of host defaults.
-        await world.page.setViewportSize({ width: maximizeWidth, height: maximizeHeight });
+        // Chromium's context already uses viewport: null (see initDriver), so the
+        // viewport tracks the real --start-maximized window size - nothing to do here,
+        // and resizing would actually un-maximize the window.
+        return;
       }
+      // Firefox/WebKit: enforce a large viewport regardless of host defaults.
+      await world.page.setViewportSize({ width: maximizeWidth, height: maximizeHeight });
       // Best-effort native resize for headed runs; harmless if browser blocks it.
       await world.page.evaluate(({ width, height }) => {
         try {
