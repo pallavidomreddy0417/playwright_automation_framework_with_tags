@@ -101,6 +101,10 @@ npm run allure:generate
 npm run allure:open
 ```
 
+## Continuous Integration
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs the smoke tests on every push/PR to `main`, across Ubuntu, Windows, and macOS runners — so anyone forking or cloning this repo gets an automatic pass/fail signal without needing Jenkins. Reports are uploaded as build artifacts on each run.
+
 ## Jenkins
 
 A declarative `Jenkinsfile` is included with parameters for `Environment`, `Role`, `Browser`, and `Tags`. It installs dependencies, runs the suite via `runner.js`, and archives `reports/`, `allure-results/`, and `reports.zip` as build artifacts (plus publishing an Allure report if the Allure Jenkins plugin is installed).
