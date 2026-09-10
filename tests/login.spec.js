@@ -20,7 +20,7 @@ async function runSafeStep(ctx, stepName, fn) {
     }
   });
 }
-
+//test
 async function verifyLogoutAndReturnToLogin(ctx, page, lp, cfg) {
   await runSafeStep(ctx, 'verify logout button is visible', async () => {
     const visible = await lp.isLogoutButtonVisible();
