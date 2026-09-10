@@ -5,7 +5,7 @@ A custom Playwright + Node.js UI test automation framework — no `@playwright/t
 ## Prerequisites
 
 - [Git](https://git-scm.com/downloads) — to clone this repo (see the [Troubleshooting](#troubleshooting) note on why `git clone` is preferred over downloading a ZIP).
-- [Node.js](https://nodejs.org/) 18 or later
+- [Node.js](https://nodejs.org/) 20 or later — required by the `playwright` package itself (`engines.node: ">=20"`); an older Node fails at `npx playwright install` with an engine-mismatch error. If you use [nvm](https://github.com/nvm-sh/nvm), running `nvm use` in this folder picks up the version pinned in `.nvmrc`.
 - npm (bundled with Node.js)
 - [Google Chrome](https://www.google.com/chrome/) installed — used when `browser=chrome` (the default). `npx playwright install` (below) separately installs Playwright's own bundled Chromium/Firefox/WebKit, which is what actually runs when `browser=chromium`/`firefox`/`webkit`.
 - [Java](https://adoptium.net/) (JRE 8 or later) — required only for generating/opening the **Allure** HTML report (`npm run allure:generate` / `npm run allure:open`, and the auto-generated `allure-report/` after a local run). `allure-commandline` shells out to a local `java` binary, so it must be on your `PATH`. Verify with `java -version`. Not needed to just run the tests — the Extent HTML report and raw `allure-results/` JSON work without Java; only turning `allure-results/` into browsable HTML needs it.
@@ -172,6 +172,7 @@ npm run allure:open
 3. **Antivirus/EDR quarantined `chrome.exe`.** Check your AV's quarantine/logs around the failure time.
 4. **Headed-window issues** (e.g. no display / remote session). Try `HEADLESS=true` (PowerShell: `$env:HEADLESS='true'`) to rule this out.
 5. **Allure HTML generation fails with `spawn java ENOENT` / `'java' is not recognized`.** Java isn't installed or isn't on your `PATH`. Install a JRE (e.g. [Adoptium Temurin](https://adoptium.net/)) and verify with `java -version`. This only affects Allure's HTML report — the tests themselves still ran and passed/failed; only `allure-report/` generation is skipped.
+6. **`npx playwright install` fails immediately (before any browser downloads), or `npm install` reports an engine/version error.** Your Node.js version is too old. `playwright` requires Node **20+**; check with `node -v` and upgrade if it's below 20 (see [Prerequisites](#prerequisites)).
 
 ## Continuous Integration
 
