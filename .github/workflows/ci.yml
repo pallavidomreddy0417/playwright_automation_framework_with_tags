@@ -14,6 +14,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      # GitHub-hosted runners have no display server, so a headed browser
+      # launch fails here (this is the same fix applied to the Jenkinsfile).
+      HEADLESS: 'true'
     steps:
       - uses: actions/checkout@v4
 
