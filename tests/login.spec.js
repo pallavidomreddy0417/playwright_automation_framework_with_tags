@@ -65,9 +65,11 @@ function normalizeUrlForAssert(url) {
 module.exports = [
   {
     name: 'Login: valid credentials (smoke)',
-    // This test performs its own login + logout assertions, so the framework's
-    // auto-logout afterEach hook is skipped to avoid a redundant second logout attempt.
-    tags: ['smoke', 'login', 'regression'],
+    // This test performs its own login + logout as explicit, reportable steps, so
+    // noLogin skips the framework's auto-login beforeEach hook (avoiding a redundant
+    // double login). The afterEach auto-logout hook still runs, but safely no-ops
+    // since this test has already logged itself out by the time it fires.
+    tags: ['smoke', 'login', 'regression', 'noLogin'],
     async run(ctx) {
       try {
         const page = ctx.page;
