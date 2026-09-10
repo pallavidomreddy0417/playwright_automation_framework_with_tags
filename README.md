@@ -4,9 +4,11 @@ A custom Playwright + Node.js UI test automation framework — no `@playwright/t
 
 ## Prerequisites
 
+- [Git](https://git-scm.com/downloads) — to clone this repo (see the [Troubleshooting](#troubleshooting) note on why `git clone` is preferred over downloading a ZIP).
 - [Node.js](https://nodejs.org/) 18 or later
 - npm (bundled with Node.js)
-- make sure chrome installed
+- [Google Chrome](https://www.google.com/chrome/) installed — used when `browser=chrome` (the default). `npx playwright install` (below) separately installs Playwright's own bundled Chromium/Firefox/WebKit, which is what actually runs when `browser=chromium`/`firefox`/`webkit`.
+- [Java](https://adoptium.net/) (JRE 8 or later) — required only for generating/opening the **Allure** HTML report (`npm run allure:generate` / `npm run allure:open`, and the auto-generated `allure-report/` after a local run). `allure-commandline` shells out to a local `java` binary, so it must be on your `PATH`. Verify with `java -version`. Not needed to just run the tests — the Extent HTML report and raw `allure-results/` JSON work without Java; only turning `allure-results/` into browsable HTML needs it.
 
 ## Setup
 
@@ -159,6 +161,8 @@ npm run allure:generate
 npm run allure:open
 ```
 
+> Both commands (and the auto-generated `allure-report/` after a local run) require **Java** to be installed and on your `PATH` — see [Prerequisites](#prerequisites). Without it they fail with an error like `spawn java ENOENT` or `'java' is not recognized`.
+
 ## Troubleshooting
 
 **`browserType.launch: Target page, context or browser has been closed`** — the browser process starts and then dies immediately, before Playwright can connect to it. This is a local-machine issue, not a code bug (the runner auto-retries the launch once for exactly this reason). Common causes and fixes:
@@ -167,6 +171,7 @@ npm run allure:open
 2. **Corrupted/incomplete browser download.** Reinstall the browser binaries: `npx playwright install --force`.
 3. **Antivirus/EDR quarantined `chrome.exe`.** Check your AV's quarantine/logs around the failure time.
 4. **Headed-window issues** (e.g. no display / remote session). Try `HEADLESS=true` (PowerShell: `$env:HEADLESS='true'`) to rule this out.
+5. **Allure HTML generation fails with `spawn java ENOENT` / `'java' is not recognized`.** Java isn't installed or isn't on your `PATH`. Install a JRE (e.g. [Adoptium Temurin](https://adoptium.net/)) and verify with `java -version`. This only affects Allure's HTML report — the tests themselves still ran and passed/failed; only `allure-report/` generation is skipped.
 
 ## Continuous Integration
 
